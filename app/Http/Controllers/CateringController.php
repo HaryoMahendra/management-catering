@@ -90,7 +90,6 @@ class CateringController extends Controller
         ]);
     }
 
-    // Halaman Booking Catering
     public function bookingIndex()
     {
         $today = Carbon::today()->toDateString();
@@ -122,23 +121,19 @@ class CateringController extends Controller
     {
         $karyawan = Karyawan::findOrFail($id);
 
-        // Update Field Dasar Karyawan
         $updateData = $request->only(['nif', 'nama', 'departemen', 'lokasi', 'shift', 'no_hp']);
 
-        // Update Tanggal (created_at) jika diisi
         if ($request->has('created_at') && $request->created_at != null) {
             $updateData['created_at'] = Carbon::parse($request->created_at)->toDateTimeString();
         }
 
         $karyawan->update($updateData);
 
-        // Update Status Catering Hari Ini
         if ($request->has('status_catering')) {
             $today = Carbon::today()->toDateString();
             $status = $request->input('status_catering');
 
             if ($status == 'sudah') {
-                // Jika diubah ke SUDAH, tambahkan record ke PengambilanCatering hari ini jika belum ada
                 PengambilanCatering::firstOrCreate(
                     [
                         'karyawan_id' => $karyawan->id,
