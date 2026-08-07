@@ -8,14 +8,14 @@
         <h1 class="h3 mb-0 text-gray-800 font-weight-bold">Booking Catering</h1>
     </div>
 
-    <!-- 1. CARD FILTER DATA BOOKING (Sesuai Layout Gambar Laporan) -->
+    <!-- 1. CARD FILTER DATA BOOKING -->
     <div class="card shadow mb-4 border-0">
         <div class="card-header py-3 bg-light border-bottom d-flex align-items-center justify-content-between">
             <h6 class="m-0 font-weight-bold text-primary">
                 Filter Data Booking Catering
             </h6>
 
-            <!-- Tombol Aksi Kanan (Upload Excel) -->
+            <!-- Tombol Upload Excel -->
             @if (in_array(Auth::user()->role, ['super_admin', 'admin_catering']))
                 <button type="button" class="btn btn-success btn-sm shadow-sm font-weight-bold" data-toggle="modal"
                     data-target="#uploadExcelModal">
@@ -39,7 +39,6 @@
                         <option value="">-- Semua --</option>
                         <option value="Shift 1">Shift 1</option>
                         <option value="Shift 2">Shift 2</option>
-                        
                     </select>
                 </div>
 
@@ -63,7 +62,7 @@
                     </select>
                 </div>
 
-                <!-- Tombol Aksi Filter -->
+                <!-- Tombol Tampilkan -->
                 <div class="col-lg-3 col-md-12 mb-3 d-flex">
                     <button id="btnTampilkan" class="btn btn-primary font-weight-bold flex-grow-1 mr-2 shadow-sm">
                         <i class="fas fa-search mr-1"></i> Tampilkan
@@ -164,7 +163,7 @@
         </div>
     </div>
 
-    <!-- MODAL EDIT DATA KARYAWAN (DITARUH DILUAR TABEL) -->
+    <!-- MODAL EDIT DATA KARYAWAN -->
     @if (in_array(Auth::user()->role, ['super_admin', 'admin_catering']))
         @foreach($karyawans as $item)
             <div class="modal fade" id="editModal{{ $item->id }}" tabindex="-1" role="dialog" aria-hidden="true">
@@ -211,13 +210,16 @@
                                             <label class="font-weight-bold text-dark">No. WhatsApp</label>
                                             <input type="text" name="no_hp" class="form-control" value="{{ $item->no_hp }}">
                                         </div>
+
+                                        <!-- INPUT TANGGAL CATERING (NAME="TANGGAL" UTAMA) -->
                                         <div class="form-group">
-                                            <label class="font-weight-bold text-dark">Tanggal</label>
-                                            <input type="date" name="created_at" class="form-control" 
-                                                value="{{ $item->created_at ? \Carbon\Carbon::parse($item->created_at)->format('Y-m-d') : '' }}">
+                                            <label class="font-weight-bold text-dark">Tanggal Booking Catering</label>
+                                            <input type="date" name="tanggal" class="form-control font-weight-bold" 
+                                                value="{{ \Carbon\Carbon::now()->format('Y-m-d') }}" required>
                                         </div>
+
                                         <div class="form-group">
-                                            <label class="font-weight-bold text-dark">Status Catering Hari Ini</label>
+                                            <label class="font-weight-bold text-dark">Status Catering</label>
                                             <select name="status_catering" class="form-control font-weight-bold">
                                                 <option value="belum" {{ $item->status_catering == 'Belum' ? 'selected' : '' }}>Belum Mengambil</option>
                                                 <option value="sudah" {{ $item->status_catering == 'Sudah' ? 'selected' : '' }}>Sudah Mengambil</option>
@@ -299,21 +301,17 @@
                 ]
             });
 
-            // 2. Logic Tombol Tampilkan Filter (Lokasi = 4, Shift = 5, Tanggal = 7, Status = 8)
+            // 2. Logic Tombol Tampilkan Filter
             $('#btnTampilkan').on('click', function() {
-                // Filter Shift
                 var shiftVal = $.fn.dataTable.util.escapeRegex($('#filterShift').val());
                 table.column(5).search(shiftVal ? '^' + shiftVal + '$' : '', true, false);
 
-                // Filter Lokasi
                 var lokasiVal = $.fn.dataTable.util.escapeRegex($('#filterLokasi').val());
                 table.column(4).search(lokasiVal ? '^' + lokasiVal + '$' : '', true, false);
 
-                // Filter Status
                 var statusVal = $.fn.dataTable.util.escapeRegex($('#filterStatus').val());
                 table.column(8).search(statusVal ? '^' + statusVal + '$' : '', true, false);
 
-                // Filter Tanggal (Format input YYYY-MM-DD disesuaikan ke DD/MM/YYYY)
                 var tanggalRaw = $('#filterTanggal').val();
                 if (tanggalRaw) {
                     var parts = tanggalRaw.split('-'); // [YYYY, MM, DD]
@@ -323,7 +321,6 @@
                     table.column(7).search('');
                 }
 
-                // Render Perubahan Tabel
                 table.draw();
             });
 
@@ -336,7 +333,7 @@
                 buttonsStyling: false
             });
 
-            // SweetAlert2 Konfirmasi Hapus Data
+            // SweetAlert2 Hapus Data
             $(document).on('click', '.btn-delete', function(e) {
                 e.preventDefault();
                 let form = $(this).closest('form');
@@ -363,7 +360,7 @@
                 });
             });
 
-            // SweetAlert2 Konfirmasi Simpan Perubahan (Edit Data)
+            // SweetAlert2 Edit Data
             $(document).on('submit', 'form[id^="formEdit"]', function(e) {
                 e.preventDefault();
                 let form = this;
@@ -383,7 +380,7 @@
                 });
             });
 
-            // Pop-up Toast Otomatis jika Aksi Berhasil
+            // Pop-up Toast Otomatis
             @if (session('success'))
                 Swal.fire({
                     icon: 'success',

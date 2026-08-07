@@ -18,11 +18,13 @@ class CateringController extends Controller
     {
         $today = Carbon::today()->toDateString();
 
+        // 1. Ringkasan Widget Atas (Hari Ini)
         $totalKaryawan = Karyawan::count();
         $sudahMengambil = PengambilanCatering::whereDate('tanggal', $today)->count();
         $belumMengambil = max(0, $totalKaryawan - $sudahMengambil);
         $persentase     = $totalKaryawan > 0 ? round(($sudahMengambil / $totalKaryawan) * 100) : 0;
 
+        // 2. Ringkasan Tabel Riwayat Monitoring (Dinamis per Tanggal)
         $ringkasanMonitoring = PengambilanCatering::selectRaw('
                 tanggal,
                 COUNT(DISTINCT karyawan_id) as sudah_mengambil
@@ -30,11 +32,19 @@ class CateringController extends Controller
             ->groupBy('tanggal')
             ->orderBy('tanggal', 'desc')
             ->get()
-            ->map(function ($item) use ($totalKaryawan) {
-                $item->total_karyawan = $totalKaryawan;
-                $item->belum_mengambil = max(0, $totalKaryawan - $item->sudah_mengambil);
-                $item->persentase = $totalKaryawan > 0 
-                    ? round(($item->sudah_mengambil / $totalKaryawan) * 100, 1) 
+            ->map(function ($item) {
+                // Total karyawan yang sudah terdaftar pada/sebelum tanggal tersebut
+                $totalKaryawanPadaTanggal = Karyawan::whereDate('created_at', '<=', $item->tanggal)->count();
+                
+                // Fallback jika data created_at tidak terikat
+                if ($totalKaryawanPadaTanggal == 0) {
+                    $totalKaryawanPadaTanggal = Karyawan::count();
+                }
+
+                $item->total_karyawan  = $totalKaryawanPadaTanggal;
+                $item->belum_mengambil = max(0, $totalKaryawanPadaTanggal - $item->sudah_mengambil);
+                $item->persentase      = $totalKaryawanPadaTanggal > 0 
+                    ? round(($item->sudah_mengambil / $totalKaryawanPadaTanggal) * 100, 1) 
                     : 0;
 
                 return $item;
@@ -45,7 +55,7 @@ class CateringController extends Controller
             'sudahMengambil', 
             'belumMengambil', 
             'persentase',
-            'ringkasanMonitoring' // Ditambahkan ke compact
+            'ringkasanMonitoring'
         ));
     }
 
@@ -90,6 +100,7 @@ class CateringController extends Controller
         ]);
     }
 
+    // Halaman Booking Catering
     public function bookingIndex()
     {
         $today = Carbon::today()->toDateString();
@@ -106,6 +117,7 @@ class CateringController extends Controller
         return view('booking', compact('karyawans'));
     }
 
+    // Proses Import Data Excel
     public function importExcel(Request $request)
     {
         $request->validate([
@@ -117,10 +129,12 @@ class CateringController extends Controller
         return redirect()->back()->with('success', 'Data Karyawan berhasil di-import dari Excel!');
     }
 
+    // Update Data Karyawan & Status Catering Presisi
     public function updateKaryawan(Request $request, $id)
     {
         $karyawan = Karyawan::findOrFail($id);
 
+        // Update Field Utama
         $updateData = $request->only(['nif', 'nama', 'departemen', 'lokasi', 'shift', 'no_hp']);
 
         if ($request->has('created_at') && $request->created_at != null) {
@@ -129,24 +143,28 @@ class CateringController extends Controller
 
         $karyawan->update($updateData);
 
+        // Update Status Catering Sesuai Tanggal Form Edit
         if ($request->has('status_catering')) {
-            $today = Carbon::today()->toDateString();
+            // Tangkap tanggal pilihan dari input form edit (fallback ke hari ini jika kosong)
+            $targetTanggal = $request->filled('tanggal') 
+                ? Carbon::parse($request->input('tanggal'))->toDateString() 
+                : Carbon::today()->toDateString();
+
             $status = $request->input('status_catering');
 
             if ($status == 'sudah') {
-                PengambilanCatering::firstOrCreate(
+                PengambilanCatering::updateOrCreate(
                     [
                         'karyawan_id' => $karyawan->id,
-                        'tanggal'     => $today,
+                        'tanggal'     => $targetTanggal,
                     ],
                     [
                         'waktu_scan'  => Carbon::now()->format('H:i:s')
                     ]
                 );
             } else {
-                // Jika diubah ke BELUM, hapus record PengambilanCatering hari ini
                 PengambilanCatering::where('karyawan_id', $karyawan->id)
-                    ->whereDate('tanggal', $today)
+                    ->whereDate('tanggal', $targetTanggal)
                     ->delete();
             }
         }
@@ -179,7 +197,6 @@ class CateringController extends Controller
             return redirect()->back()->with('error', 'Pilih minimal satu karyawan untuk dikirimi WhatsApp!');
         }
 
-        // Endpoint & Config API SaungWA
         $targetUrl = env('SAUNG_WA_URL', 'https://app.saungwa.com/api/send-message');
         $apiKey    = env('SAUNG_WA_API_KEY', '3LLxtpwipbJJsotqlOu4Q5JO9sivKjKWozERUfOC4EjWsPN6UJ');
 
@@ -193,7 +210,6 @@ class CateringController extends Controller
                 continue;
             }
 
-            // Normalisasi Format Nomor HP ke 62
             $targetHp = preg_replace('/[^0-9]/', '', $karyawan->no_hp);
             if (substr($targetHp, 0, 1) === '0') {
                 $targetHp = '62' . substr($targetHp, 1);
@@ -208,14 +224,12 @@ class CateringController extends Controller
             $pesan .= "Terima kasih,\n_Management Catering_";
 
             try {
-                // Request dengan format JSON & Header Authorization khas SaungWA
                 $response = Http::acceptJson()->post($targetUrl, [
                     'api_key' => $apiKey,
                     'number'  => $targetHp,
                     'message' => $pesan,
                 ]);
 
-                // Verifikasi respon balasan dari SaungWA
                 $responseData = $response->json();
 
                 if ($response->successful() && isset($responseData['status']) && $responseData['status'] == true) {
@@ -236,22 +250,17 @@ class CateringController extends Controller
     // Halaman Laporan Catering
     public function laporanIndex(Request $request)
     {
-        // Default rentang tanggal: Hari ini
         $startDate = $request->input('start_date', Carbon::today()->toDateString());
         $endDate = $request->input('end_date', Carbon::today()->toDateString());
-        $filterStatus = $request->input('status', 'semua'); // semua / sudah / belum
+        $filterStatus = $request->input('status', 'semua');
 
-        // Ambil ID karyawan yang SUDAH scan pada rentang tanggal tersebut
         $sudahScanIds = PengambilanCatering::whereBetween('tanggal', [$startDate, $endDate])
             ->pluck('karyawan_id')
             ->toArray();
 
-        // Query Dasar Karyawan
         $query = Karyawan::query();
 
-        // Ambil semua karyawan dan tentukan statusnya
         $karyawans = $query->get()->map(function($karyawan) use ($sudahScanIds, $startDate, $endDate) {
-            // Cari detail pengambilan jika sudah pernah scan
             $pengambilan = PengambilanCatering::where('karyawan_id', $karyawan->id)
                 ->whereBetween('tanggal', [$startDate, $endDate])
                 ->first();
@@ -263,14 +272,12 @@ class CateringController extends Controller
             return $karyawan;
         });
 
-        // Filter berdasarkan status jika dipilih
         if ($filterStatus == 'sudah') {
             $karyawans = $karyawans->where('status_catering', 'Sudah');
         } elseif ($filterStatus == 'belum') {
             $karyawans = $karyawans->where('status_catering', 'Belum');
         }
 
-        // Hitung Ringkasan Data
         $totalKaryawan = Karyawan::count();
         $totalSudah = count($sudahScanIds);
         $totalBelum = max(0, $totalKaryawan - $totalSudah);

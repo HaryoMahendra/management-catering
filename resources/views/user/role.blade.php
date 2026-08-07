@@ -62,7 +62,7 @@
                     "infoFiltered": "(difilter dari _MAX_ total data)",
             
                 },
-                "pageLength": 5,
+                "pageLength": 10,
                 "order": [
                     [0, "asc"]
                 ]
