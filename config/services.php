@@ -31,4 +31,10 @@ return [
         'region' => env('AWS_DEFAULT_REGION', 'us-east-1'),
     ],
 
+    'saungwa' => [
+    'appkey'   => env('SAUNGWA_APPKEY'),
+    'authkey'  => env('SAUNGWA_AUTHKEY'),
+    'endpoint' => env('SAUNGWA_ENDPOINT'),
+],
+
 ];

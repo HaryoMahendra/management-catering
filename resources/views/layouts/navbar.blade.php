@@ -98,7 +98,6 @@
     function updateClock() {
         const now = new Date();
 
-        // Format Hari dan Tanggal (Bahasa Indonesia)
         const optionsDate = {
             weekday: 'long',
             year: 'numeric',
@@ -107,13 +106,11 @@
         };
         const dateString = now.toLocaleDateString('id-ID', optionsDate);
 
-        // Format Jam, Menit, Detik (24 Jam)
         const hours = String(now.getHours()).padStart(2, '0');
         const minutes = String(now.getMinutes()).padStart(2, '0');
         const seconds = String(now.getSeconds()).padStart(2, '0');
         const timeString = `${hours}:${minutes}:${seconds} WIB`;
 
-        // Render ke HTML
         if (document.getElementById('current-day-date')) {
             document.getElementById('current-day-date').innerText = dateString;
         }
@@ -122,7 +119,6 @@
         }
     }
 
-    // Jalankan pertama kali & update tiap 1 detik
     updateClock();
     setInterval(updateClock, 1000);
 </script>

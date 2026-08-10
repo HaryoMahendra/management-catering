@@ -22,7 +22,9 @@
 <div class="card shadow mb-4 border-0 no-print">
     <!-- Header Card: Judul & Tombol Cetak Laporan Sejajar -->
     <div class="card-header py-3 bg-light border-bottom d-flex align-items-center justify-content-between">
-        <h6 class="m-0 font-weight-bold text-primary">Laporan Data Managemen Catering</h6>
+        <h6 class="m-0 font-weight-bold text-primary">
+                 <i class="fas fa-solid fa-filter"></i>Filter Data Laporan
+            </h6>
         <button type="button" id="btnCetak" class="btn btn-primary btn-sm shadow-sm font-weight-bold">
             <i class="fas fa-print fa-sm text-white-50 mr-2"></i> Cetak Laporan
         </button>

@@ -190,62 +190,66 @@ class CateringController extends Controller
 
     // Proses Kirim WA Blast via API Saung WA
     public function whatsappSendBlast(Request $request)
-    {
-        $karyawanIds = $request->input('karyawan_ids', []);
+{
+    $karyawanIds = $request->input('karyawan_ids', []);
 
-        if (empty($karyawanIds)) {
-            return redirect()->back()->with('error', 'Pilih minimal satu karyawan untuk dikirimi WhatsApp!');
-        }
-
-        $targetUrl = env('SAUNG_WA_URL', 'https://app.saungwa.com/api/send-message');
-        $apiKey    = env('SAUNG_WA_API_KEY', '3LLxtpwipbJJsotqlOu4Q5JO9sivKjKWozERUfOC4EjWsPN6UJ');
-
-        $karyawans = Karyawan::whereIn('id', $karyawanIds)->get();
-        $sukses = 0;
-        $gagal = 0;
-
-        foreach ($karyawans as $karyawan) {
-            if (empty($karyawan->no_hp)) {
-                $gagal++;
-                continue;
-            }
-
-            $targetHp = preg_replace('/[^0-9]/', '', $karyawan->no_hp);
-            if (substr($targetHp, 0, 1) === '0') {
-                $targetHp = '62' . substr($targetHp, 1);
-            }
-
-            $linkScan = route('scan.index', ['nif' => $karyawan->nif]);
-
-            $pesan = "Halo *{$karyawan->nama}*,\n\n";
-            $pesan .= "Silakan klik link berikut untuk membuka QR Code Pengambilan Catering Anda (NIF: *{$karyawan->nif}*):\n\n";
-            $pesan .= "👉 {$linkScan}\n\n";
-            $pesan .= "Tunjukkan QR Code di link tersebut kepada petugas catering.\n\n";
-            $pesan .= "Terima kasih,\n_Management Catering_";
-
-            try {
-                $response = Http::acceptJson()->post($targetUrl, [
-                    'api_key' => $apiKey,
-                    'number'  => $targetHp,
-                    'message' => $pesan,
-                ]);
-
-                $responseData = $response->json();
-
-                if ($response->successful() && isset($responseData['status']) && $responseData['status'] == true) {
-                    $sukses++;
-                } else {
-                    Log::error("Gagal kirim WA ke {$targetHp}: " . json_encode($responseData));
-                    $gagal++;
-                }
-            } catch (\Exception $e) {
-                Log::error("Exception WA Blast: " . $e->getMessage());
-                $gagal++;
-            }
-        }
-
-        return redirect()->back()->with('success', "Proses Blast Selesai! Berhasil dikirim: {$sukses}, Gagal: {$gagal}");
+    if (empty($karyawanIds)) {
+        return redirect()->back()->with('error', 'Pilih minimal satu karyawan untuk dikirimi WhatsApp!');
     }
+
+    $targetUrl = config('services.saungwa.endpoint');
+$appKey    = config('services.saungwa.appkey');
+$authKey   = config('services.saungwa.authkey');
+
+    $karyawans = Karyawan::whereIn('id', $karyawanIds)->get();
+    $sukses = 0;
+    $gagal = 0;
+
+    foreach ($karyawans as $karyawan) {
+        if (empty($karyawan->no_hp)) {
+            $gagal++;
+            continue;
+        }
+
+        $targetHp = preg_replace('/[^0-9]/', '', $karyawan->no_hp);
+        if (substr($targetHp, 0, 1) === '0') {
+            $targetHp = '62' . substr($targetHp, 1);
+        }
+
+        $linkScan = route('scan.index', ['nif' => $karyawan->nif]);
+
+        $pesan = "Halo *{$karyawan->nama}*,\n\n";
+        $pesan .= "Silakan klik link berikut untuk membuka QR Code Pengambilan Catering Anda (NIF: *{$karyawan->nif}*):\n\n";
+        $pesan .= "👉 {$linkScan}\n\n";
+        $pesan .= "Tunjukkan QR Code di link tersebut kepada petugas catering.\n\n";
+        $pesan .= "Terima kasih,\n_Management Catering_";
+
+        try {
+            $response = Http::asForm()->post($targetUrl, [
+    'appkey'  => $appKey,
+    'authkey' => $authKey,
+    'to'      => $targetHp,
+    'message' => $pesan,
+]);
+
+            $responseData = $response->json();
+
+            if ($response->successful() && ($responseData['message_status'] ?? null) === 'Success') {
+    $sukses++;
+} else {
+    Log::error("Gagal kirim WA ke {$targetHp}: " . json_encode($responseData));
+    $gagal++;
+}
+        } catch (\Exception $e) {
+            Log::error("Exception WA Blast: " . $e->getMessage());
+            $gagal++;
+        }
+
+        usleep(700000); // jeda ±0.7 detik antar pesan, hindari blokir
+    }
+
+    return redirect()->back()->with('success', "Proses Blast Selesai! Berhasil dikirim: {$sukses}, Gagal: {$gagal}");
+}
 
     // Halaman Laporan Catering
     public function laporanIndex(Request $request)

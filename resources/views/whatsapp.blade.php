@@ -33,7 +33,7 @@
                                 <th>Nama Karyawan</th>
                                 <th>Departemen</th>
                                 <th>No. WhatsApp</th>
-                                <th>Link Target Scan</th>
+                                {{-- <th>Link Target Scan</th> --}}
                             </tr>
                         </thead>
                         <tbody>
@@ -50,12 +50,12 @@
                                     <td>
                                         {{ $item->no_hp }}
                                     </td>
-                                    <td>
+                                    {{-- <td>
                                         <a href="{{ route('scan.index', ['nif' => $item->nif]) }}" target="_blank"
                                             class="btn btn-outline-primary btn-sm rounded-pill font-weight-bold">
                                             <i class="fas fa-external-link-alt mr-1"></i> Buka Link QR
                                         </a>
-                                    </td>
+                                    </td> --}}
                                 </tr>
                             @empty
                                 <tr>
@@ -79,7 +79,6 @@
 
     <script>
         $(document).ready(function() {
-            // 1. Inisialisasi DataTables
             $('#dataTableWA').DataTable({
                 "language": {
                     "lengthMenu": "Tampilkan _MENU_ data per halaman",
@@ -95,12 +94,10 @@
                 "pageLength": 10
             });
 
-            // 2. Toggle Check All / Uncheck All Karyawan
             $('#checkAll').click(function() {
                 $('.check-item').prop('checked', this.checked);
             });
 
-            // 3. Alert Berhasil / Gagal via SweetAlert2
             @if (session('success'))
                 Swal.fire({
                     icon: 'success',

@@ -43,7 +43,7 @@
         <!-- Role User -->
         <li class="nav-item {{ request()->is('role*') ? 'active' : '' }}">
             <a class="nav-link" href="{{ route('role.index') }}">
-                <i class="fas fa-fw fa-user-tag"></i>
+                <i class="fas fa-solid fa-user-shield"></i>
                 <span>Role User</span>
             </a>
         </li>

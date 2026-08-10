@@ -11,8 +11,8 @@
     <!-- 1. CARD FILTER DATA BOOKING -->
     <div class="card shadow mb-4 border-0">
         <div class="card-header py-3 bg-light border-bottom d-flex align-items-center justify-content-between">
-            <h6 class="m-0 font-weight-bold text-primary">
-                Filter Data Booking Catering
+             <h6 class="m-0 font-weight-bold text-primary">
+                 <i class="fas fa-solid fa-filter"></i>Filter Data Booking Catering
             </h6>
 
             <!-- Tombol Upload Excel -->
