@@ -78,7 +78,7 @@
 
                         <div class="text-right mt-3">
                             <button type="submit" class="btn btn-primary font-weight-bold shadow-sm px-4">
-                                <i class="fas fa-save mr-1"></i> Simpan
+                            Simpan
                             </button>
                         </div>
                     </form>

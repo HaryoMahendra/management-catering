@@ -35,7 +35,7 @@ class CateringController extends Controller
             ->map(function ($item) {
                 // Total karyawan yang sudah terdaftar pada/sebelum tanggal tersebut
                 $totalKaryawanPadaTanggal = Karyawan::whereDate('created_at', '<=', $item->tanggal)->count();
-                
+
                 // Fallback jika data created_at tidak terikat
                 if ($totalKaryawanPadaTanggal == 0) {
                     $totalKaryawanPadaTanggal = Karyawan::count();
@@ -43,17 +43,17 @@ class CateringController extends Controller
 
                 $item->total_karyawan  = $totalKaryawanPadaTanggal;
                 $item->belum_mengambil = max(0, $totalKaryawanPadaTanggal - $item->sudah_mengambil);
-                $item->persentase      = $totalKaryawanPadaTanggal > 0 
-                    ? round(($item->sudah_mengambil / $totalKaryawanPadaTanggal) * 100, 1) 
+                $item->persentase      = $totalKaryawanPadaTanggal > 0
+                    ? round(($item->sudah_mengambil / $totalKaryawanPadaTanggal) * 100, 1)
                     : 0;
 
                 return $item;
             });
 
         return view('dashboard', compact(
-            'totalKaryawan', 
-            'sudahMengambil', 
-            'belumMengambil', 
+            'totalKaryawan',
+            'sudahMengambil',
+            'belumMengambil',
             'persentase',
             'ringkasanMonitoring'
         ));
@@ -77,12 +77,12 @@ class CateringController extends Controller
         }
 
         $alreadyScanned = PengambilanCatering::where('karyawan_id', $karyawan->id)
-                            ->whereDate('tanggal', $today)
-                            ->exists();
+            ->whereDate('tanggal', $today)
+            ->exists();
 
         if ($alreadyScanned) {
             return response()->json([
-                'success' => false, 
+                'success' => false,
                 'message' => 'Karyawan (' . $karyawan->nama . ') SUDAH mengambil catering hari ini!'
             ]);
         }
@@ -109,7 +109,7 @@ class CateringController extends Controller
             ->pluck('karyawan_id')
             ->toArray();
 
-        $karyawans = Karyawan::all()->map(function($karyawan) use ($sudahScanIds) {
+        $karyawans = Karyawan::all()->map(function ($karyawan) use ($sudahScanIds) {
             $karyawan->status_catering = in_array($karyawan->id, $sudahScanIds) ? 'Sudah' : 'Belum';
             return $karyawan;
         });
@@ -146,8 +146,8 @@ class CateringController extends Controller
         // Update Status Catering Sesuai Tanggal Form Edit
         if ($request->has('status_catering')) {
             // Tangkap tanggal pilihan dari input form edit (fallback ke hari ini jika kosong)
-            $targetTanggal = $request->filled('tanggal') 
-                ? Carbon::parse($request->input('tanggal'))->toDateString() 
+            $targetTanggal = $request->filled('tanggal')
+                ? Carbon::parse($request->input('tanggal'))->toDateString()
                 : Carbon::today()->toDateString();
 
             $status = $request->input('status_catering');
@@ -181,75 +181,12 @@ class CateringController extends Controller
         return redirect()->back()->with('success', 'Data karyawan berhasil dihapus!');
     }
 
-    // Halaman WhatsApp Blast QR
+    // Halaman WhatsApp QR / Catering Card
     public function whatsappIndex()
     {
         $karyawans = Karyawan::whereNotNull('no_hp')->get();
         return view('whatsapp', compact('karyawans'));
     }
-
-    // Proses Kirim WA Blast via API Saung WA
-    public function whatsappSendBlast(Request $request)
-{
-    $karyawanIds = $request->input('karyawan_ids', []);
-
-    if (empty($karyawanIds)) {
-        return redirect()->back()->with('error', 'Pilih minimal satu karyawan untuk dikirimi WhatsApp!');
-    }
-
-    $targetUrl = config('services.saungwa.endpoint');
-$appKey    = config('services.saungwa.appkey');
-$authKey   = config('services.saungwa.authkey');
-
-    $karyawans = Karyawan::whereIn('id', $karyawanIds)->get();
-    $sukses = 0;
-    $gagal = 0;
-
-    foreach ($karyawans as $karyawan) {
-        if (empty($karyawan->no_hp)) {
-            $gagal++;
-            continue;
-        }
-
-        $targetHp = preg_replace('/[^0-9]/', '', $karyawan->no_hp);
-        if (substr($targetHp, 0, 1) === '0') {
-            $targetHp = '62' . substr($targetHp, 1);
-        }
-
-        $linkScan = route('scan.index', ['nif' => $karyawan->nif]);
-
-        $pesan = "Halo *{$karyawan->nama}*,\n\n";
-        $pesan .= "Silakan klik link berikut untuk membuka QR Code Pengambilan Catering Anda (NIF: *{$karyawan->nif}*):\n\n";
-        $pesan .= "👉 {$linkScan}\n\n";
-        $pesan .= "Tunjukkan QR Code di link tersebut kepada petugas catering.\n\n";
-        $pesan .= "Terima kasih,\n_Management Catering_";
-
-        try {
-            $response = Http::asForm()->post($targetUrl, [
-    'appkey'  => $appKey,
-    'authkey' => $authKey,
-    'to'      => $targetHp,
-    'message' => $pesan,
-]);
-
-            $responseData = $response->json();
-
-            if ($response->successful() && ($responseData['message_status'] ?? null) === 'Success') {
-    $sukses++;
-} else {
-    Log::error("Gagal kirim WA ke {$targetHp}: " . json_encode($responseData));
-    $gagal++;
-}
-        } catch (\Exception $e) {
-            Log::error("Exception WA Blast: " . $e->getMessage());
-            $gagal++;
-        }
-
-        usleep(700000); // jeda ±0.7 detik antar pesan, hindari blokir
-    }
-
-    return redirect()->back()->with('success', "Proses Blast Selesai! Berhasil dikirim: {$sukses}, Gagal: {$gagal}");
-}
 
     // Halaman Laporan Catering
     public function laporanIndex(Request $request)
@@ -264,7 +201,7 @@ $authKey   = config('services.saungwa.authkey');
 
         $query = Karyawan::query();
 
-        $karyawans = $query->get()->map(function($karyawan) use ($sudahScanIds, $startDate, $endDate) {
+        $karyawans = $query->get()->map(function ($karyawan) use ($sudahScanIds, $startDate, $endDate) {
             $pengambilan = PengambilanCatering::where('karyawan_id', $karyawan->id)
                 ->whereBetween('tanggal', [$startDate, $endDate])
                 ->first();
@@ -272,7 +209,7 @@ $authKey   = config('services.saungwa.authkey');
             $karyawan->status_catering = in_array($karyawan->id, $sudahScanIds) ? 'Sudah' : 'Belum';
             $karyawan->waktu_scan = $pengambilan ? $pengambilan->waktu_scan : '-';
             $karyawan->tanggal_scan = $pengambilan ? $pengambilan->tanggal : '-';
-            
+
             return $karyawan;
         });
 
@@ -287,20 +224,29 @@ $authKey   = config('services.saungwa.authkey');
         $totalBelum = max(0, $totalKaryawan - $totalSudah);
 
         return view('laporan', compact(
-            'karyawans', 
-            'startDate', 
-            'endDate', 
-            'filterStatus', 
-            'totalKaryawan', 
-            'totalSudah', 
+            'karyawans',
+            'startDate',
+            'endDate',
+            'filterStatus',
+            'totalKaryawan',
+            'totalSudah',
             'totalBelum'
         ));
     }
 
-    // Test Barcode View
-    public function testBarcode()
+    // Halaman Card Catering (Mendukung Filter Spesifik via Parameter NIF / Keyword)
+    public function cardCatering(Request $request)
     {
-        $karyawans = Karyawan::all();
-        return view('test-barcode', compact('karyawans'));
+        $query = Karyawan::query();
+
+        // Jika ada parameter keyword/nif di URL (misal: /cardcatering?keyword=NIF-001)
+        if ($request->filled('keyword')) {
+            $keyword = trim($request->input('keyword'));
+            $query->where('nif', $keyword);
+        }
+
+        $karyawans = $query->get();
+
+        return view('cardcatering', compact('karyawans'));
     }
 }

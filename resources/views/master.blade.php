@@ -77,6 +77,7 @@
 
             <!-- Footer -->
             @include('layouts.footer')
+            
 
         </div>
         <!-- End of Content Wrapper -->

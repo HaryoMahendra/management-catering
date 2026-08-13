@@ -3,9 +3,11 @@
 
     <!-- Sidebar - Brand (Logo Header Top) -->
     <a class="sidebar-brand d-flex align-items-center justify-content-center" href="{{ route('dashboard') }}">
-        <div class="sidebar-brand-icon">
-            <i class="fas fa-utensils"></i>
-        </div>
+                            
+       
+                                <img src="{{ asset('logo2.png') }}" alt="Logo" class="img-fluid"
+                                    style="max-height: 40px; width: auto;">
+                          
         <div class="sidebar-brand-text mx-3">Management Catering</div>
     </a>
 
@@ -86,8 +88,8 @@
         </li>
 
         <!-- Nav Item - Kartu Karyawan -->
-        <li class="nav-item {{ request()->is('barcode*') || request()->is('test-barcode*') ? 'active' : '' }}">
-            <a class="nav-link" href="{{ route('barcode.test') }}">
+        <li class="nav-item {{ request()->is('barcode*') || request()->is('cardcatering*') ? 'active' : '' }}">
+            <a class="nav-link" href="{{ route('kartu.index') }}">
                 <i class="fas fa-solid fa-address-card"></i>
                 <span>Kartu Karyawan</span>
             </a>
@@ -97,7 +99,7 @@
         <li class="nav-item {{ request()->is('whatsapp*') ? 'active' : '' }}">
             <a class="nav-link" href="{{ route('whatsapp.index') }}">
                 <i class="fab fa-fw fa-whatsapp"></i>
-                <span>WhatsApp Blast QR</span>
+                <span>WhatsApp Catering</span>
             </a>
         </li>
 

@@ -432,7 +432,7 @@
                         <span id="selectedCount" class="badge badge-primary px-2 py-1">0</span> Kartu Terpilih
                     </span>
                     <button onclick="printSelectedCards()" class="btn btn-primary btn-sm font-weight-bold shadow-sm">
-                        <i class="fas fa-print fa-sm text-white-50 mr-2"></i> Cetak Kartu Terpilih
+                        Cetak Kartu
                     </button>
                 </div>
             </div>
@@ -504,20 +504,11 @@
                         <label>
                             <input type="checkbox" class="card-select-checkbox" checked
                                 onchange="onCardCheckboxChange(this)">
-                            Cetak kartu ini
+                            Cetak kartu
                         </label>
                     </div>
 
                     <div class="catering-card">
-
-                        <!-- 1. Header Kartu -->
-                        {{-- <div class="card-header-navy">
-                            <h4>CATERING CARD</h4>
-                            <div class="logo">
-                                <img src="{{ asset('logo1.png') }}" alt="Logo" class="img-fluid"
-                                    style="max-height: 28px;">
-                            </div>
-                        </div> --}}
 
                         <div class="card-header-navy">
                             <h4 class="m-0 font-weight-bold">CATERING CARD</h4>

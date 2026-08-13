@@ -12,10 +12,10 @@
     <div class="card shadow mb-4 border-0">
         <div class="card-header py-3 d-flex justify-content-between align-items-center">
             <h6 class="m-0 font-weight-bold text-primary">
-                  <i class="fa-solid fa-house-chimney-user"></i> Daftar User Sistem
+                  <i class="fa-solid fa-house-chimney-user"></i> Daftar Data User
             </h6>
             <button class="btn btn-sm btn-primary" data-toggle="modal" data-target="#modalTambahUser">
-                <i class="fas fa-plus"></i> Tambah User
+                Tambah User
             </button>
         </div>
 

@@ -26,7 +26,7 @@
                  <i class="fas fa-solid fa-filter"></i>Filter Data Laporan
             </h6>
         <button type="button" id="btnCetak" class="btn btn-primary btn-sm shadow-sm font-weight-bold">
-            <i class="fas fa-print fa-sm text-white-50 mr-2"></i> Cetak Laporan
+            Cetak Laporan
         </button>
     </div>
 

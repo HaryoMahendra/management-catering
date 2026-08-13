@@ -19,6 +19,8 @@ Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
 Route::post('/login', [AuthController::class, 'login'])->name('login.post');
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
+// Route Publik - Kartu Karyawan (dibuka lewat link WA, tanpa login)
+Route::get('/kartu/{nif}', [CateringController::class, 'testBarcode'])->name('kartu.show');
 
 /*
 |--------------------------------------------------------------------------
@@ -36,20 +38,21 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/scan', [CateringController::class, 'scanIndex'])->name('scan.index');
         Route::post('/scan/process', [CateringController::class, 'processScan'])->name('scan.process');
         
-        // Print / Test Barcode
-        Route::get('/test-barcode', [CateringController::class, 'testBarcode'])->name('barcode.test');
+        // Print / Kartu Catering Karyawan
+        Route::get('/cardcatering', [CateringController::class, 'cardCatering'])->name('kartu.index');
     });
 
     // 2. VIEW DATA, EDIT & UPLOAD: DIAKSES OLEH SUPER ADMIN & ADMIN CATERING
     Route::middleware([CheckRole::class . ':super_admin,admin_catering'])->group(function () {
-        Route::get('/booking', [CateringController::class, 'bookingIndex'])->name('booking.index');
-        Route::post('/booking/import', [CateringController::class, 'importExcel'])->name('booking.import');
-        Route::put('/booking/update/{id}', [CateringController::class, 'updateKaryawan'])->name('booking.update');
-        
-        Route::get('/whatsapp', [CateringController::class, 'whatsappIndex'])->name('whatsapp.index');
-        Route::post('/whatsapp/send', [CateringController::class, 'whatsappSendBlast'])->name('whatsapp.send');
-        Route::get('/laporan', [CateringController::class, 'laporanIndex'])->name('laporan.index');
-    });
+    Route::get('/booking', [CateringController::class, 'bookingIndex'])->name('booking.index');
+    Route::post('/booking/import', [CateringController::class, 'importExcel'])->name('booking.import');
+    Route::put('/booking/update/{id}', [CateringController::class, 'updateKaryawan'])->name('booking.update');
+    
+    Route::get('/whatsapp', [CateringController::class, 'whatsappIndex'])->name('whatsapp.index');
+    Route::post('/whatsapp/send', [CateringController::class, 'whatsappSendBlast'])->name('whatsapp.send');
+    Route::post('/whatsapp/send-single/{id}', [CateringController::class, 'whatsappSendSingle'])->name('whatsapp.send-single'); // baru
+    Route::get('/laporan', [CateringController::class, 'laporanIndex'])->name('laporan.index');
+});
 
     // 3. KHUSUS SUPER ADMIN ONLY (Aksi Hapus & Manajemen User/Role)
     Route::middleware([CheckRole::class . ':super_admin'])->group(function () {
