@@ -109,10 +109,10 @@
                     <button class="btn btn-secondary font-weight-bold" type="button" data-dismiss="modal">Batal</button>
                     
                     <!-- Form Logout Laravel (POST Method & CSRF Protected) -->
-                    <form action="{{ route('logout') }}" method="POST" class="d-inline">
+                    <form action="{{ route('logout') }}" method="POST" class="d-inline" id="logoutForm">
                         @csrf
-                        <button type="submit" class="btn btn-danger font-weight-bold">
-                            <i class="fas fa-power-off mr-1"></i> Ya, Logout
+                        <button type="button" class="btn btn-danger font-weight-bold" onclick="confirmLogout()">
+                            <i class="fas fa-power-off mr-1"></i> Logout
                         </button>
                     </form>
                 </div>
