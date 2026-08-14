@@ -12,11 +12,13 @@
     <title>@yield('title', 'Dashboard') - Management Catering</title>
 
     <!-- CDN FontAwesome 6 -->
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 
     <!-- Custom fonts for this template-->
     <link href="{{ asset('sbadmin') }}/vendor/fontawesome-free/css/all.min.css" rel="stylesheet" type="text/css">
-    <link href="https://fonts.googleapis.com/css?family=Nunito:200,200i,300,300i,400,400i,600,600i,700,700i,800,800i,900,900i" rel="stylesheet">
+    <link
+        href="https://fonts.googleapis.com/css?family=Nunito:200,200i,300,300i,400,400i,600,600i,700,700i,800,800i,900,900i"
+        rel="stylesheet">
 
     <!-- Custom styles for this template-->
     <link href="{{ asset('sbadmin') }}/css/sb-admin-2.min.css" rel="stylesheet">
@@ -77,7 +79,7 @@
 
             <!-- Footer -->
             @include('layouts.footer')
-            
+
 
         </div>
         <!-- End of Content Wrapper -->
@@ -91,7 +93,8 @@
     </a>
 
     <!-- Logout Modal Pop-up -->
-    <div class="modal fade" id="logoutModal" tabindex="-1" role="dialog" aria-labelledby="logoutModalLabel" aria-hidden="true">
+    <div class="modal fade" id="logoutModal" tabindex="-1" role="dialog" aria-labelledby="logoutModalLabel"
+        aria-hidden="true">
         <div class="modal-dialog" role="document">
             <div class="modal-content border-0 shadow-lg">
                 <div class="modal-header bg-danger text-white">
@@ -106,12 +109,13 @@
                     Apakah Anda yakin ingin keluar dari aplikasi <strong>Management Catering</strong>?
                 </div>
                 <div class="modal-footer bg-light">
-                    <button class="btn btn-secondary font-weight-bold" type="button" data-dismiss="modal">Batal</button>
-                    
+                    <button class="btn btn-secondary font-weight-bold" type="button"
+                        data-dismiss="modal">Batal</button>
+
                     <!-- Form Logout Laravel (POST Method & CSRF Protected) -->
                     <form action="{{ route('logout') }}" method="POST" class="d-inline" id="logoutForm">
                         @csrf
-                        <button type="button" class="btn btn-danger font-weight-bold" onclick="confirmLogout()">
+                        <button type="submit" class="btn btn-danger font-weight-bold">
                             <i class="fas fa-power-off mr-1"></i> Logout
                         </button>
                     </form>
