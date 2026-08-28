@@ -11,8 +11,8 @@
     <!-- 1. CARD FILTER DATA BOOKING -->
     <div class="card shadow mb-4 border-0">
         <div class="card-header py-3 bg-light border-bottom d-flex align-items-center justify-content-between">
-             <h6 class="m-0 font-weight-bold text-primary">
-                 <i class="fas fa-solid fa-filter"></i>Filter Data Booking Catering
+            <h6 class="m-0 font-weight-bold text-primary">
+                <i class="fas fa-solid fa-filter"></i>Filter Data Booking Catering
             </h6>
 
             <!-- Tombol Upload Excel -->
@@ -37,8 +37,10 @@
                     <label class="font-weight-bold text-dark small mb-1">Shift</label>
                     <select id="filterShift" class="form-control font-weight-bold">
                         <option value="">-- Semua --</option>
+                        <option value="Non Shift">Non Shift</option>
                         <option value="Shift 1">Shift 1</option>
                         <option value="Shift 2">Shift 2</option>
+                        <option value="Shift 3">Shift 3</option>
                     </select>
                 </div>
 
@@ -47,8 +49,9 @@
                     <label class="font-weight-bold text-dark small mb-1">Lokasi</label>
                     <select id="filterLokasi" class="form-control font-weight-bold">
                         <option value="">-- Semua --</option>
-                        <option value="Kantin 1">Kantin 1</option>
-                        <option value="Kantin 2">Kantin 2</option>
+                        <option value="GCPI 1">GCPI 1</option>
+                        <option value="GCPI 2">GCPI 2</option>
+                        <option value="GCPI 3">GCPI 3</option>
                     </select>
                 </div>
 
@@ -86,12 +89,11 @@
                     <thead class="bg-light text-dark font-weight-bold">
                         <tr>
                             <th width="5%">No</th>
-                            <th>NIF</th>
+                            <th>NIK</th>
                             <th>Nama Karyawan</th>
                             <th>Departemen</th>
                             <th>Lokasi</th>
                             <th>Shift</th>
-                            <th>No. WhatsApp</th>
                             <th>Tanggal</th>
                             <th>Status</th>
                             <th width="12%" class="text-center">Aksi</th>
@@ -106,16 +108,6 @@
                                 <td>{{ $item->departemen ?? '-' }}</td>
                                 <td>{{ $item->lokasi ?? '-' }}</td>
                                 <td>{{ $item->shift ?? '-' }}</td>
-                                <td>
-                                    @if ($item->no_hp)
-                                        <a href="https://wa.me/{{ preg_replace('/[^0-9]/', '', $item->no_hp) }}"
-                                            target="_blank" class="text-success text-decoration-none font-weight-bold">
-                                            {{ $item->no_hp }}
-                                        </a>
-                                    @else
-                                        -
-                                    @endif
-                                </td>
                                 <td>
                                     @if ($item->created_at)
                                         {{ \Carbon\Carbon::parse($item->created_at)->format('d/m/Y') }}
@@ -154,7 +146,7 @@
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="10" class="text-center text-muted py-4">Belum ada data booking catering terdaftar.</td>
+                                <td colspan="9" class="text-center text-muted py-4">Belum ada data booking catering terdaftar.</td>
                             </tr>
                         @endforelse
                     </tbody>
@@ -183,46 +175,66 @@
                                     <!-- Kolom Kiri -->
                                     <div class="col-md-6 border-right">
                                         <div class="form-group">
-                                            <label class="font-weight-bold text-dark">NIF</label>
+                                            <label class="font-weight-bold text-dark">NIK</label>
                                             <input type="text" name="nif" class="form-control" value="{{ $item->nif }}" required>
                                         </div>
                                         <div class="form-group">
                                             <label class="font-weight-bold text-dark">Nama Karyawan</label>
                                             <input type="text" name="nama" class="form-control text-uppercase" value="{{ $item->nama }}" required>
                                         </div>
+
+                                        <!-- DROPDOWN DEPARTEMEN -->
                                         <div class="form-group">
                                             <label class="font-weight-bold text-dark">Departemen</label>
-                                            <input type="text" name="departemen" class="form-control" value="{{ $item->departemen }}">
+                                            <select name="departemen" class="form-control font-weight-bold">
+                                                <option value="">-- Pilih Departemen --</option>
+                                                @foreach ($karyawans->pluck('departemen')->filter()->unique()->sort() as $dept)
+                                                    <option value="{{ $dept }}" {{ strtolower($item->departemen ?? '') == strtolower($dept) ? 'selected' : '' }}>
+                                                        {{ $dept }}
+                                                    </option>
+                                                @endforeach
+                                            </select>
                                         </div>
+
+                                        <!-- DROPDOWN LOKASI -->
                                         <div class="form-group">
                                             <label class="font-weight-bold text-dark">Lokasi</label>
-                                            <input type="text" name="lokasi" class="form-control" value="{{ $item->lokasi }}">
+                                            <select name="lokasi" class="form-control font-weight-bold">
+                                                <option value="">-- Pilih Lokasi --</option>
+                                                <option value="GCPI 1" {{ strtolower($item->lokasi ?? '') == 'gcpi 1' ? 'selected' : '' }}>GCPI 1</option>
+                                                <option value="GCPI 2" {{ strtolower($item->lokasi ?? '') == 'gcpi 2' ? 'selected' : '' }}>GCPI 2</option>
+                                                <option value="GCPI 3" {{ strtolower($item->lokasi ?? '') == 'gcpi 3' ? 'selected' : '' }}>GCPI 3</option>
+                                            </select>
                                         </div>
                                     </div>
 
                                     <!-- Kolom Kanan -->
                                     <div class="col-md-6">
+                                        <!-- DROPDOWN SHIFT -->
                                         <div class="form-group">
                                             <label class="font-weight-bold text-dark">Shift</label>
-                                            <input type="text" name="shift" class="form-control" value="{{ $item->shift }}">
-                                        </div>
-                                        <div class="form-group">
-                                            <label class="font-weight-bold text-dark">No. WhatsApp</label>
-                                            <input type="text" name="no_hp" class="form-control" value="{{ $item->no_hp }}">
+                                            <select name="shift" class="form-control font-weight-bold">
+                                                <option value="">-- Pilih Shift --</option>
+                                                <option value="Non Shift" {{ in_array(strtolower($item->shift ?? ''), ['non shift', 'nonshift']) ? 'selected' : '' }}>Non Shift (08:00 - 17:00)</option>
+                                                <option value="Shift 1" {{ in_array(strtolower($item->shift ?? ''), ['shift 1', 'shift1']) ? 'selected' : '' }}>Shift 1 (07:00 - 15:00)</option>
+                                                <option value="Shift 2" {{ in_array(strtolower($item->shift ?? ''), ['shift 2', 'shift2']) ? 'selected' : '' }}>Shift 2 (15:00 - 23:00)</option>
+                                                <option value="Shift 3" {{ in_array(strtolower($item->shift ?? ''), ['shift 3', 'shift3']) ? 'selected' : '' }}>Shift 3 (23:00 - 07:00)</option>
+                                            </select>
                                         </div>
 
-                                        <!-- INPUT TANGGAL CATERING (NAME="TANGGAL" UTAMA) -->
+                                        <!-- INPUT TANGGAL CATERING -->
                                         <div class="form-group">
                                             <label class="font-weight-bold text-dark">Tanggal Booking Catering</label>
                                             <input type="date" name="tanggal" class="form-control font-weight-bold" 
-                                                value="{{ \Carbon\Carbon::now()->format('Y-m-d') }}" required>
+                                                value="{{ $item->created_at ? \Carbon\Carbon::parse($item->created_at)->format('Y-m-d') : '' }}" required>
                                         </div>
 
+                                        <!-- STATUS CATERING -->
                                         <div class="form-group">
                                             <label class="font-weight-bold text-dark">Status Catering</label>
                                             <select name="status_catering" class="form-control font-weight-bold">
-                                                <option value="belum" {{ $item->status_catering == 'Belum' ? 'selected' : '' }}>Belum Mengambil</option>
-                                                <option value="sudah" {{ $item->status_catering == 'Sudah' ? 'selected' : '' }}>Sudah Mengambil</option>
+                                                <option value="belum" {{ strtolower($item->status_catering ?? '') == 'belum' ? 'selected' : '' }}>Belum Mengambil</option>
+                                                <option value="sudah" {{ strtolower($item->status_catering ?? '') == 'sudah' ? 'selected' : '' }}>Sudah Mengambil</option>
                                             </select>
                                         </div>
                                     </div>
@@ -258,8 +270,8 @@
                                 <input type="file" name="file_excel" class="form-control-file border p-2 rounded w-100" required>
                             </div>
                             <small class="text-muted">
-                                * Header kolom di file Excel harus berisi: <code>nif</code>, <code>nama</code>,
-                                <code>departemen</code>, <code>lokasi</code>, <code>shift</code>, <code>no_hp</code>.
+                                * Header kolom di file Excel harus berisi: <code>nik</code>, <code>nama</code>,
+                                <code>departemen</code>, <code>lokasi</code>, <code>shift</code>, <code>tanggal</code>.
                             </small>
                         </div>
                         <div class="modal-footer">
@@ -281,7 +293,6 @@
 
     <script>
         $(document).ready(function() {
-            // 1. Inisialisasi DataTables
             var table = $('#dataTable').DataTable({
                 "language": {
                     "lengthMenu": "Tampilkan _MENU_ data per halaman",
@@ -289,7 +300,7 @@
                     "info": "Menampilkan halaman _PAGE_ dari _PAGES_ (Total _TOTAL_ data)",
                     "infoEmpty": "Tidak ada data tersedia",
                     "infoFiltered": "(difilter dari _MAX_ total data)",
-                    "search": "Cari NIF/ Karyawan / Departemen:",
+                    "search": "Cari NIK/ Karyawan / Departemen:",
                     "paginate": {
                         "previous": "Sebelumnya",
                         "next": "Selanjutnya"
@@ -301,7 +312,6 @@
                 ]
             });
 
-            // 2. Logic Tombol Tampilkan Filter
             $('#btnTampilkan').on('click', function() {
                 var shiftVal = $.fn.dataTable.util.escapeRegex($('#filterShift').val());
                 table.column(5).search(shiftVal ? '^' + shiftVal + '$' : '', true, false);
@@ -310,21 +320,20 @@
                 table.column(4).search(lokasiVal ? '^' + lokasiVal + '$' : '', true, false);
 
                 var statusVal = $.fn.dataTable.util.escapeRegex($('#filterStatus').val());
-                table.column(8).search(statusVal ? '^' + statusVal + '$' : '', true, false);
+                table.column(7).search(statusVal ? '^' + statusVal + '$' : '', true, false);
 
                 var tanggalRaw = $('#filterTanggal').val();
                 if (tanggalRaw) {
                     var parts = tanggalRaw.split('-'); // [YYYY, MM, DD]
                     var formattedTanggal = parts[2] + '/' + parts[1] + '/' + parts[0];
-                    table.column(7).search(formattedTanggal);
+                    table.column(6).search(formattedTanggal);
                 } else {
-                    table.column(7).search('');
+                    table.column(6).search('');
                 }
 
                 table.draw();
             });
 
-            // Mixin Style SweetAlert2
             const swalWithBootstrapButtons = Swal.mixin({
                 customClass: {
                     confirmButton: "btn btn-success mx-2",
@@ -333,7 +342,6 @@
                 buttonsStyling: false
             });
 
-            // SweetAlert2 Hapus Data
             $(document).on('click', '.btn-delete', function(e) {
                 e.preventDefault();
                 let form = $(this).closest('form');
@@ -360,7 +368,6 @@
                 });
             });
 
-            // SweetAlert2 Edit Data
             $(document).on('submit', 'form[id^="formEdit"]', function(e) {
                 e.preventDefault();
                 let form = this;
@@ -380,7 +387,6 @@
                 });
             });
 
-            // Pop-up Toast Otomatis
             @if (session('success'))
                 Swal.fire({
                     icon: 'success',

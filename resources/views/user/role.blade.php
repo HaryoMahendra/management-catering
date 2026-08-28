@@ -52,7 +52,6 @@
 
     <script>
         $(document).ready(function() {
-            // 1. Inisialisasi DataTables
             var table = $('#dataTable').DataTable({
                 "language": {
                     "lengthMenu": "Tampilkan _MENU_ data per halaman",

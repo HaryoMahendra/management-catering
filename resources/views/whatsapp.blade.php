@@ -47,13 +47,11 @@
                     <tbody>
                         @forelse($karyawans as $index => $item)
                             @php
-                                // Normalisasi Nomor HP ke format 62
                                 $noHp = preg_replace('/[^0-9]/', '', $item->no_hp);
                                 if (substr($noHp, 0, 1) === '0') {
                                     $noHp = '62' . substr($noHp, 1);
                                 }
 
-                                // Link ke Catering Card
                                 $linkCard = route('kartu.index', ['keyword' => $item->nif]);
                             @endphp
                             <tr>
@@ -139,14 +137,13 @@
     <script src="{{ asset('sbadmin') }}/vendor/datatables/dataTables.bootstrap4.min.js"></script>
 
     <script>
-        // Template Bawaan (Default)
         const defaultTemplate = 
 `Halo Yth. *{nama}*,
 
 Berikut kami kirimkan Kartu Catering Digital Anda untuk pengambilan porsi catering.
 
 📋 *Detail Karyawan:*
-• NIF: *{nif}*
+• NIK: *{nik}*
 • Departemen: *{departemen}*
 
 👉 *Klik link di bawah ini untuk membuka Catering Card Anda:*
@@ -157,12 +154,10 @@ Tunjukkan QR Code pada kartu tersebut kepada petugas catering saat melakukan pen
 Terima kasih,
 _Management Catering_`;
 
-        // 1. Ambil Template dari LocalStorage Browser
         function getSavedTemplate() {
             return localStorage.getItem('wa_template_catering') || defaultTemplate;
         }
 
-        // 2. Fungsi Formatter URL Pesan WA
         function generateWaUrl(noHp, nama, nif, departemen, link) {
             let template = getSavedTemplate();
             let pesan = template
@@ -174,13 +169,11 @@ _Management Catering_`;
             return `https://api.whatsapp.com/send?phone=${noHp}&text=${encodeURIComponent(pesan)}`;
         }
 
-        // 3. Kirim Pesan Satuan
         function kirimPesanWA(noHp, nama, nif, departemen, link) {
             let url = generateWaUrl(noHp, nama, nif, departemen, link);
             window.open(url, '_blank');
         }
 
-        // 4. Kirim Pesan Sekaligus (Batch / Multi-Tab)
         function kirimPesanBatch() {
             let selectedItems = $('.check-item:checked');
 
@@ -194,14 +187,12 @@ _Management Catering_`;
                 return;
             }
 
-            // Peringatan keamanan browser jika terlalu banyak tab
             if (selectedItems.length > 5) {
                 if (!confirm(`Anda memilih ${selectedItems.length} kontak. Rekomendasi aman adalah 5 kontak per sesi agar browser tidak memblokir pop-up. Lanjutkan?`)) {
                     return;
                 }
             }
 
-            // Buka Tab Baru Bertahap (Jeda 600ms per Tab)
             selectedItems.each(function (index, el) {
                 let noHp = $(el).data('nohp');
                 let nama = $(el).data('nama');
@@ -213,17 +204,15 @@ _Management Catering_`;
 
                 setTimeout(function () {
                     window.open(url, '_blank');
-                }, index * 600); // Delay 0.6 detik antar tab
+                }, index * 600); 
             });
         }
 
-        // 5. Update Hitungan Checkbox Terpilih
         function updateCounter() {
             let total = $('.check-item:checked').length;
             $('#countSelected').text(total);
         }
 
-        // 6. Simpan Template
         function simpanTemplate() {
             let teksBaru = $('#inputTemplateWA').val().trim();
             if(!teksBaru) {
@@ -241,7 +230,6 @@ _Management Catering_`;
             });
         }
 
-        // 7. Reset Template
         function resetTemplateDefault() {
             if(confirm('Apakah Anda yakin ingin mengembalikan template ke format awal?')) {
                 localStorage.removeItem('wa_template_catering');
@@ -250,7 +238,6 @@ _Management Catering_`;
         }
 
         $(document).ready(function() {
-            // Inisialisasi DataTables
             $('#dataTableWA').DataTable({
                 "language": {
                     "lengthMenu": "Tampilkan _MENU_ data per halaman",
@@ -266,13 +253,11 @@ _Management Catering_`;
                 "pageLength": 10
             });
 
-            // Handle Check All
             $('#checkAll').click(function() {
                 $('.check-item:not(:disabled)').prop('checked', this.checked);
                 updateCounter();
             });
 
-            // Isi nilai textarea saat modal dibuka
             $('#modalTemplateWA').on('show.bs.modal', function () {
                 $('#inputTemplateWA').val(getSavedTemplate());
             });

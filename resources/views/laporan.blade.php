@@ -234,7 +234,7 @@
                 "zeroRecords": "Data tidak ditemukan",
                 "info": "Menampilkan halaman _PAGE_ dari _PAGES_ (Total _TOTAL_ data)",
                 "infoEmpty": "Tidak ada data tersedia",
-                "search": "Cari Karyawan / NIF / Departemen:",
+                "search": "Cari Karyawan / NIK / Departemen:",
                 "paginate": {
                     "previous": "Sebelumnya",
                     "next": "Selanjutnya"
@@ -244,17 +244,14 @@
             "order": [[ 0, "asc" ]]
         });
 
-        // Handler Cetak: Tampilkan Semua Baris Sebelum Print, Lalu Kembalikan ke Semula
         $('#btnCetak').on('click', function() {
             var currentLength = table.page.len();
             
-            // Tampilkan seluruh data
             table.page.len(-1).draw();
 
             setTimeout(function() {
                 window.print();
                 
-                // Kembalikan pagination seperti semula setelah dialog print ditutup
                 table.page.len(currentLength).draw();
             }, 300);
         });

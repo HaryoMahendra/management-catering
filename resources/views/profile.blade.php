@@ -91,7 +91,6 @@
 @push('scripts')
     <script>
         $(document).ready(function() {
-            // Preview Foto Instan Sebelum di-Upload
             $('#fotoInput').on('change', function() {
                 const file = this.files[0];
                 if (file) {
@@ -103,7 +102,6 @@
                 }
             });
 
-            // Mixin Style SweetAlert2
             const swalWithBootstrapButtons = Swal.mixin({
                 customClass: {
                     confirmButton: "btn btn-primary mx-2",
@@ -112,7 +110,6 @@
                 buttonsStyling: false
             });
 
-            // Konfirmasi Sebelum Submit Form Profile
             $('#formProfile').on('submit', function(e) {
                 e.preventDefault();
                 let form = this;
@@ -132,7 +129,6 @@
                 });
             });
 
-            // Pop-up Toast Sukses
             @if (session('success'))
                 Swal.fire({
                     icon: 'success',
@@ -143,7 +139,6 @@
                 });
             @endif
 
-            // Pop-up Alert Error Validasi
             @if ($errors->any())
                 Swal.fire({
                     icon: 'error',

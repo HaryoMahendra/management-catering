@@ -3,11 +3,7 @@
 
     <!-- Sidebar - Brand (Logo Header Top) -->
     <a class="sidebar-brand d-flex align-items-center justify-content-center" href="{{ route('dashboard') }}">
-                            
-       
-                                <img src="{{ asset('logo2.png') }}" alt="Logo" class="img-fluid"
-                                    style="max-height: 40px; width: auto;">
-                          
+        <img src="{{ asset('logo2.png') }}" alt="Logo" class="img-fluid" style="max-height: 40px; width: auto;">
         <div class="sidebar-brand-text mx-3">Management Catering</div>
     </a>
 
@@ -36,11 +32,11 @@
 
         <!-- Data User -->
         <li class="nav-item {{ request()->is('user*') ? 'active' : '' }}">
-    <a class="nav-link" href="{{ route('user.index') }}">
-        <i class="fa-solid fa-users-gear"></i>
-        <span>Data User</span>
-    </a>
-</li>
+            <a class="nav-link" href="{{ route('user.index') }}">
+                <i class="fa-solid fa-users-gear"></i>
+                <span>Data User</span>
+            </a>
+        </li>
 
         <!-- Role User -->
         <li class="nav-item {{ request()->is('role*') ? 'active' : '' }}">
@@ -95,13 +91,13 @@
             </a>
         </li>
 
-        <!-- Nav Item - WhatsApp Blast QR -->
+        {{-- <!-- Nav Item - WhatsApp Blast QR -->
         <li class="nav-item {{ request()->is('whatsapp*') ? 'active' : '' }}">
             <a class="nav-link" href="{{ route('whatsapp.index') }}">
                 <i class="fab fa-fw fa-whatsapp"></i>
                 <span>WhatsApp Catering</span>
             </a>
-        </li>
+        </li> --}}
 
         <!-- Divider -->
         <hr class="sidebar-divider">

@@ -13,10 +13,10 @@ return new class extends Migration
 {
     Schema::create('karyawans', function (Blueprint $table) {
         $table->id();
-        $table->string('nif')->unique();          // NIF / ID QR Code Karyawan
-        $table->string('nama');                  // Nama Lengkap
-        $table->string('departemen')->nullable();   // Departemen
-        $table->string('lokasi')->nullable();      // Lokasi Kantin 1 dan 2 
+        $table->string('nif')->unique();          
+        $table->string('nama');                  
+        $table->string('departemen')->nullable();   
+        $table->string('lokasi')->nullable();      
         $table->string('shift')->nullable();  
         $table->string('no_hp')->nullable();
         $table->timestamps();

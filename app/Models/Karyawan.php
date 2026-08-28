@@ -8,8 +8,16 @@ use Illuminate\Database\Eloquent\Model;
 class Karyawan extends Model
 {
     use HasFactory;
-
-    protected $fillable = ['nif', 'nama', 'departemen', 'lokasi', 'shift', 'no_hp'];
+    
+    protected $fillable = [
+    'nif',
+    'nama',
+    'departemen',
+    'lokasi',
+    'shift',
+    'no_hp',
+    'created_at' // Tambahkan ini agar tidak diblokir Laravel
+];
 
     public function pengambilanCatering()
     {

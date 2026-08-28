@@ -65,17 +65,16 @@
                     </span>
                 </span>
                 <img class="img-profile rounded-circle" style="object-fit: cover;"
-    src="{{ Auth::user()->foto ? asset('storage/profile/' . Auth::user()->foto) : asset('sbadmin/img/undraw_profile.svg') }}">
+                    src="{{ Auth::user()->foto ? asset('storage/profile/' . Auth::user()->foto) : asset('sbadmin/img/undraw_profile.svg') }}">
             </a>
 
             <!-- Dropdown Profile User -->
             <div class="dropdown-menu dropdown-menu-right shadow animated--grow-in" aria-labelledby="userDropdown">
                 <!-- Tombol Profile-->
-                <!-- Tombol Profile-->
-<a class="dropdown-item" href="{{ route('profile.index') }}">
-    <i class="fas fa-user fa-sm fa-fw mr-2 text-primary"></i>
-    Profile
-</a>
+                <a class="dropdown-item" href="{{ route('profile.index') }}">
+                    <i class="fas fa-user fa-sm fa-fw mr-2 text-primary"></i>
+                    Profile
+                </a>
 
                 <div class="dropdown-divider"></div>
 

