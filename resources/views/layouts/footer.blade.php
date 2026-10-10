@@ -10,9 +10,10 @@
     <div class="container my-auto">
         <div class="copyright text-center my-auto">
             <span>
-                <a href="https://www.godrejindonesia.com/" target="_blank" class="text-decoration-none text-secondary">
-                    Godrej Consumer Products Limited © 2026. All rights reserved.
+                <a href="https://www.godrejindonesia.com/" target="_blank" class="text-decoration-none text-primary">
+                    Godrej Consumer Products Limited 
                 </a>
+                © 2026. All rights reserved.
             </span>
         </div>
     </div>

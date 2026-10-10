@@ -23,10 +23,10 @@
     <!-- Header Card: Judul & Tombol Cetak Laporan Sejajar -->
     <div class="card-header py-3 bg-light border-bottom d-flex align-items-center justify-content-between">
         <h6 class="m-0 font-weight-bold text-primary">
-                 <i class="fas fa-solid fa-filter"></i>Filter Data Laporan
-            </h6>
+            <i class="fas fa-solid fa-filter"></i> Filter Data Laporan
+        </h6>
         <button type="button" id="btnCetak" class="btn btn-primary btn-sm shadow-sm font-weight-bold">
-            Cetak Laporan
+            <i class="fas fa-print mr-1"></i> Cetak Laporan
         </button>
     </div>
 
@@ -70,50 +70,55 @@
         <div class="table-responsive">
             <table class="table table-hover align-middle table-print-bordered" id="dataTableLaporan" width="100%" cellspacing="0">
                 <thead class="bg-light text-dark font-weight-bold">
-                    <tr>
-                        <th width="5%">No</th>
-                        <th>NIF</th>
-                        <th>Nama Karyawan</th>
-                        <th>Departemen</th>
-                        <th>Lokasi</th>
-                        <th>Shift</th>
-                        <th>Waktu Scan</th>
-                        <th class="text-center">Status</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @forelse($karyawans as $index => $item)
-                    <tr>
-                        <td>{{ $loop->iteration }}</td>
-                        <td class="font-weight-bold text-dark">{{ $item->nif }}</td>
-                        <td class="text-uppercase">{{ $item->nama }}</td>
-                        <td>{{ $item->departemen ?? '-' }}</td>
-                        <td>{{ $item->lokasi ?? '-' }}</td>
-                        <td>{{ $item->shift ?? '-' }}</td>
-                        <td>
-                            @if($item->waktu_scan != '-')
-                                {{-- <span class="badge badge-light border text-dark p-2 print-no-badge"> --}}
-                                    {{-- <i class="fas fa-clock mr-1 text-primary no-print"></i> --}}
-                                    {{ $item->waktu_scan }} WIB
-                                {{-- </span> --}}
-                            @else
-                                -
-                            @endif
-                        </td>
-                        <td class="text-center">
-                            @if($item->status_catering == 'Sudah')
-                                <span class="badge bg-success text-white px-3 py-2 rounded-pill print-no-badge">Sudah</span>
-                            @else
-                                <span class="badge bg-danger text-white px-3 py-2 rounded-pill print-no-badge">Belum</span>
-                            @endif
-                        </td>
-                    </tr>
-                    @empty
-                    <tr>
-                        <td colspan="8" class="text-center text-muted py-4">Tidak ada data untuk periode tanggal ini.</td>
-                    </tr>
-                    @endforelse
-                </tbody>
+    <tr>
+        <th width="5%">No</th>
+        <th>Employee No</th> <!-- Diubah dari NIK -->
+        <th>Name</th>
+        <th>Department</th>
+        <th>Location</th>
+        <th>Schedule</th>
+        <th>Tanggal Booking</th>
+        <th>Waktu Scan</th>
+        <th class="text-center">Status</th>
+    </tr>
+</thead>
+               <tbody>
+    @forelse($karyawans as $index => $item)
+    <tr>
+        <td>{{ $loop->iteration }}</td>
+        <td class="font-weight-bold text-dark">{{ $item->employee_no ?? $item->nif }}</td> <!-- Diubah ke employee_no -->
+        <td class="text-uppercase">{{ $item->name ?? $item->nama }}</td>
+        <td>{{ $item->departemen ?? $item->dept ?? '-' }}</td>
+        <td>{{ $item->location ?? $item->lokasi ?? '-' }}</td>
+        <td>{{ $item->schedule ?? $item->shift ?? '-' }}</td>
+        <td>
+            @if ($item->created_at)
+                {{ \Carbon\Carbon::parse($item->created_at)->format('d/m/Y') }}
+            @else
+                -
+            @endif
+        </td>
+        <td>
+            @if($item->waktu_scan != '-')
+                {{ $item->waktu_scan }} WIB
+            @else
+                -
+            @endif
+        </td>
+        <td class="text-center">
+            @if($item->status_catering == 'Sudah')
+                <span class="badge bg-success text-white px-3 py-2 rounded-pill print-no-badge">Sudah</span>
+            @else
+                <span class="badge bg-danger text-white px-3 py-2 rounded-pill print-no-badge">Belum</span>
+            @endif
+        </td>
+    </tr>
+    @empty
+    <tr>
+        <td colspan="9" class="text-center text-muted py-4">Tidak ada data untuk periode tanggal ini.</td>
+    </tr>
+    @endforelse
+</tbody>
             </table>
         </div>
     </div>
@@ -230,16 +235,16 @@
     $(document).ready(function() {
         var table = $('#dataTableLaporan').DataTable({
             "language": {
-                "lengthMenu": "Tampilkan _MENU_ data per halaman",
-                "zeroRecords": "Data tidak ditemukan",
-                "info": "Menampilkan halaman _PAGE_ dari _PAGES_ (Total _TOTAL_ data)",
-                "infoEmpty": "Tidak ada data tersedia",
-                "search": "Cari Karyawan / NIK / Departemen:",
-                "paginate": {
-                    "previous": "Sebelumnya",
-                    "next": "Selanjutnya"
-                }
-            },
+    "lengthMenu": "Tampilkan _MENU_ data per halaman",
+    "zeroRecords": "Data tidak ditemukan",
+    "info": "Halaman _PAGE_ dari _PAGES_ (Total _TOTAL_ data)",
+    "infoEmpty": "Tidak ada data tersedia",
+    "search": "Cari Name / Employee No / Department:", 
+    "paginate": {
+        "previous": "Sebelumnya",
+        "next": "Selanjutnya"
+    }
+},
             "pageLength": 10,
             "order": [[ 0, "asc" ]]
         });
@@ -253,7 +258,7 @@
                 window.print();
                 
                 table.page.len(currentLength).draw();
-            }, 300);
+            }, 500);
         });
     });
 </script>

@@ -9,14 +9,17 @@ class PengambilanCatering extends Model
 {
     use HasFactory;
 
-    // Tambahkan baris ini untuk mengizinkan kolom diisi secara otomatis
     protected $fillable = [
         'karyawan_id', 
         'tanggal', 
         'waktu_scan'
     ];
 
-    // Relasi ke Model Karyawan
+    protected static function booted()
+    {
+        static::observe(\App\Observers\ActivityObserver::class);
+    }
+
     public function karyawan()
     {
         return $this->belongsTo(Karyawan::class);

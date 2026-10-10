@@ -2,6 +2,8 @@
 
 namespace App\Providers;
 
+use App\Helpers\ActivityHelper; 
+use Illuminate\Auth\Events\Login;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Auth\Listeners\SendEmailVerificationNotification;
 use Illuminate\Foundation\Support\Providers\EventServiceProvider as ServiceProvider;
@@ -25,7 +27,18 @@ class EventServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        //
+        Event::listen(Login::class, function ($event) {
+            $event->user->update([
+                'last_login_at' => now(),
+                'last_login_ip' => request()->ip(),
+            ]);
+
+            // Catat otomatis ke tabel log aktivitas
+            ActivityHelper::record(
+                'Login', 
+                "User {$event->user->name} ({$event->user->email}) berhasil masuk ke sistem."
+            );
+        });
     }
 
     /**

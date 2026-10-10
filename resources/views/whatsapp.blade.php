@@ -242,7 +242,7 @@ _Management Catering_`;
                 "language": {
                     "lengthMenu": "Tampilkan _MENU_ data per halaman",
                     "zeroRecords": "Data tidak ditemukan",
-                    "info": "Menampilkan halaman _PAGE_ dari _PAGES_ (Total _TOTAL_ data)",
+                    "info": "Halaman _PAGE_ dari _PAGES_ (Total _TOTAL_ data)",
                     "infoEmpty": "Tidak ada data tersedia",
                     "search": "Cari Karyawan / NIF / WA:",
                     "paginate": {

@@ -8,16 +8,24 @@ use Illuminate\Database\Eloquent\Model;
 class Karyawan extends Model
 {
     use HasFactory;
-    
+
     protected $fillable = [
-    'nif',
-    'nama',
-    'departemen',
-    'lokasi',
-    'shift',
-    'no_hp',
-    'created_at' // Tambahkan ini agar tidak diblokir Laravel
-];
+        'employee_no',      
+        'name',             
+        'employment_under', 
+        'departemen',       
+        'indonesia_level',  
+        'location',         
+        'schedule',         
+        'no_hp',
+        'created_at',       
+        'updated_at'
+    ];
+
+    protected static function booted()
+    {
+        static::observe(\App\Observers\ActivityObserver::class);
+    }
 
     public function pengambilanCatering()
     {

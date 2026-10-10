@@ -8,7 +8,7 @@
         <h1 class="h3 mb-0 text-gray-800 font-weight-bold">
             Scan QR Catering
         </h1>
-        <p class="text-muted mb-0">Scan barcode karyawan atau masukkan NIK secara manual</p>
+        <p class="text-muted mb-0">Scan barcode karyawan atau masukkan Employee No secara manual</p>
     </div>
 
     <div class="row justify-content-center">
@@ -16,7 +16,7 @@
             <div class="card shadow-sm border-0 mb-4">
                 <div class="card-header py-3 bg-primary text-white d-flex align-items-center">
                     <i class="fas fa-camera mr-2"></i>
-                    <h6 class="m-0 font-weight-bold">Scan Barcode atau Masukkan NIK</h6>
+                    <h6 class="m-0 font-weight-bold">Scan Barcode atau Masukkan Employee No</h6>
                 </div>
 
                 <div class="card-body p-4">
@@ -27,13 +27,13 @@
 
                     <div class="manual-input-section">
                         <label class="small text-gray-600 font-weight-bold text-uppercase mb-2">
-                            <i class="fas fa-keyboard mr-1"></i> Masukkan NIK Manual
+                            <i class="fas fa-keyboard mr-1"></i> Masukkan Employee No Manual
                         </label>
                         <div class="input-group input-group-lg">
-                            <input type="text" id="manual_nif" class="form-control" placeholder="Contoh: NIK-001"
-                                onkeydown="if(event.key === 'Enter'){ submitManualNif(); }">
+                            <input type="text" id="manual_employee_no" class="form-control" placeholder="Contoh: GI172995"
+                                onkeydown="if(event.key === 'Enter'){ submitManualEmployeeNo(); }">
                             <div class="input-group-append">
-                                <button class="btn btn-primary font-weight-bold" type="button" onclick="submitManualNif()">
+                                <button class="btn btn-primary font-weight-bold" type="button" onclick="submitManualEmployeeNo()">
                                     <i class="fas fa-paper-plane mr-1"></i> Submit
                                 </button>
                             </div>
@@ -137,13 +137,13 @@
 
         let isProcessing = false;
 
-        function processNifScan(nifCode) {
+        function processEmployeeScan(employeeNo) {
             if (isProcessing) return;
             isProcessing = true;
 
             Swal.fire({
                 title: 'Memproses...',
-                text: `Memeriksa data NIK: ${nifCode}`,
+                text: `Memeriksa data Employee No: ${employeeNo}`,
                 allowOutsideClick: false,
                 didOpen: () => {
                     Swal.showLoading();
@@ -158,7 +158,7 @@
                         "X-CSRF-TOKEN": "{{ csrf_token() }}"
                     },
                     body: JSON.stringify({
-                        nif: nifCode
+                        employee_no: employeeNo
                     })
                 })
                 .then(async response => {
@@ -180,11 +180,19 @@
                             html: `
             <p class="mb-2">${data.message}</p>
             <hr class="my-2">
-            <div class="text-left small bg-light p-3 rounded">
-                <div><b>Nama :</b> ${data.karyawan.nama}</div>
-                <div><b>Dept :</b> ${data.karyawan.departemen ?? '-'} (${data.karyawan.lokasi ?? '-'})</div>
-                <div><b>Shift :</b> ${data.karyawan.shift ?? '-'}</div>
-            </div>
+            <div class="text-left small bg-light p-3 rounded" style="display: grid; grid-template-columns: 100px 1fr; gap: 6px 10px;">
+    <b>Nama</b>
+    <div>: ${data.karyawan.nama}</div>
+    
+    <b>Departemen</b>
+    <div>: ${data.karyawan.departemen ?? '-'}</div>
+    
+    <b>Lokasi</b>
+    <div>: ${data.karyawan.lokasi ?? '-'}</div>
+    
+    <b>Shift</b>
+    <div>: ${data.karyawan.shift ?? '-'}</div>
+</div>
         `,
                             showConfirmButton: true,
                             confirmButtonText: 'Tutup',
@@ -202,8 +210,6 @@
                             text: data.message,
                             confirmButtonText: 'Tutup',
                             confirmButtonColor: '#dc3545',
-                            // timer: 3500,
-                            // timerProgressBar: true
                         }).then(() => {
                             isProcessing = false;
                         });
@@ -224,11 +230,11 @@
                 });
         }
 
-        function submitManualNif() {
-            let nifInput = document.getElementById('manual_nif').value.trim();
-            if (nifInput) {
-                processNifScan(nifInput);
-                document.getElementById('manual_nif').value = '';
+        function submitManualEmployeeNo() {
+            let employeeInput = document.getElementById('manual_employee_no').value.trim();
+            if (employeeInput) {
+                processEmployeeScan(employeeInput);
+                document.getElementById('manual_employee_no').value = '';
             }
         }
 
@@ -236,14 +242,14 @@
             fps: 10,
             qrbox: 250
         });
-        html5QrcodeScanner.render((decodedText) => processNifScan(decodedText));
+        html5QrcodeScanner.render((decodedText) => processEmployeeScan(decodedText));
 
         document.addEventListener('DOMContentLoaded', function() {
             const params = new URLSearchParams(window.location.search);
-            const nifFromUrl = params.get('nif');
-            if (nifFromUrl) {
-                document.getElementById('manual_nif').value = nifFromUrl;
-                processNifScan(nifFromUrl);
+            const employeeFromUrl = params.get('employee_no') || params.get('nif');
+            if (employeeFromUrl) {
+                document.getElementById('manual_employee_no').value = employeeFromUrl;
+                processEmployeeScan(employeeFromUrl);
             }
         });
     </script>
